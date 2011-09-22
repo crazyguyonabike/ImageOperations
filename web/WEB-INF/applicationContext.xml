@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+                    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <!--
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <value>classpath:demo.properties</value>
+    </property>
+  </bean>
+  -->
+
+  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="assembler" ref="assembler"/>
+    <property name="autodetect" value="true"/>
+    <property name="namingStrategy" ref="namingStrategy"/>
+  </bean>
+
+  <bean id="jmxAttributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+
+  <bean id="namingStrategy" class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+    <property name="attributeSource" ref="jmxAttributeSource"/>
+  </bean>
+
+  <!-- will create management interface using annotation metadata -->
+  <bean id="assembler"
+        class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+    <property name="attributeSource" ref="jmxAttributeSource"/>
+  </bean>
+
+  <bean id="operationManager" class="com.ufp.demo.operations.OperationManager">
+    <property name="operations">
+      <map>
+	<entry>
+            <key><value>raw</value></key>
+	    <ref bean="rawOperation"/>
+        </entry>
+	<entry>
+            <key><value>blur</value></key>
+	    <ref bean="blurOperation"/>
+        </entry>
+	<entry>
+            <key><value>grey</value></key>
+	    <ref bean="greyOperation"/>
+        </entry>
+      </map>
+    </property>
+    <property name="cacheService" ref="cacheService"/>
+  </bean>
+
+  <bean id="rawOperation" class="com.ufp.demo.operations.RawOperation"/>
+  <bean id="blurOperation" class="com.ufp.demo.operations.BlurOperation"/>
+  <bean id="greyOperation" class="com.ufp.demo.operations.GreyOperation"/>
+
+  <bean id="cacheService" class="com.ufp.demo.services.CacheService"
+	destroy-method="shutdown"/>
+</beans>
